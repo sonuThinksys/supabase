@@ -15,7 +15,7 @@ export default function CustomDrawerContent() {
       });
     }, []);
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.header}>
           <Text style={styles.headerText}>{user?.email}</Text>
         </View>
