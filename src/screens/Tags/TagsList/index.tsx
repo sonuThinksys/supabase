@@ -51,8 +51,11 @@ export default function TagsList() {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={Colors.primary} />
+      <View style={styles.container}>
+        <Header title={TAGS_LIST_STRINGS.TITLE} showBack />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+        </View>
       </View>
     );
   }
