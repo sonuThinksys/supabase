@@ -54,6 +54,14 @@ export default function CustomDrawerContent() {
           })}>
             <Text>Create Tag</Text>
           </TouchableOpacity>
+          <TouchableOpacity style={styles.content}  onPress={() => navigation.navigate(Routes.MAIN_APP,{
+            screen: Routes.DASHBOARD,
+            params: {
+              screen: Routes.TAGS_LIST,
+            },
+          })}>
+            <Text>Tags</Text>
+          </TouchableOpacity>
         </View>
         <View style={styles.divider} />
        <View style={styles.content}>

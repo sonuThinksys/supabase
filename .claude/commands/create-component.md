@@ -6,3 +6,4 @@ Create a production-ready React Native component:
 - proper styles
 - error handling
 - remove unused code
+- User <Header> when create component.
