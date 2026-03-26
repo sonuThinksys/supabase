@@ -4,18 +4,19 @@ import { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Routes } from './Routes';
 import { Colors } from '../theme/colors';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function CustomDrawerContent() {
     const navigation = useNavigation<any>();
     const [user, setUser] = useState<any>(null);
+    const insets = useSafeAreaInsets();
     useEffect(() => {
       supabase.auth.getUser().then(({ data }) => {
         setUser(data.user);
       });
     }, []);
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={[styles.container, { paddingTop: insets.top }]}>
         <View style={styles.header}>
           <Text style={styles.headerText}>{user?.email}</Text>
         </View>
@@ -58,7 +59,7 @@ export default function CustomDrawerContent() {
        <View style={styles.content}>
          <Button title="Logout" onPress={() => supabase.auth.signOut()} />
        </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
