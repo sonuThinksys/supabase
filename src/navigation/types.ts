@@ -18,4 +18,5 @@ export type DashboardStackParamList = {
   [Routes.PROJECTS]: undefined;
   [Routes.CREATE_TASK]: undefined;
   [Routes.CREATE_TAG]: undefined;
+  [Routes.TAGS_LIST]: undefined;
 };
