@@ -9,10 +9,12 @@ import AuthStack from './AuthStack';
 import SplashScreen from '../screens/Auth/SplashScreen';
 
 const Stack = createNativeStackNavigator();
+const SPLASH_DURATION_MS = 2000;
 
 export default function AppNavigator() {
   // undefined = loading, null = no session, Session = authenticated
   const [session, setSession] = useState<Session | null | undefined>(undefined);
+  const [splashReady, setSplashReady] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -23,10 +25,17 @@ export default function AppNavigator() {
       setSession(newSession);
     });
 
-    return () => listener.subscription.unsubscribe();
+    const splashTimer = setTimeout(() => {
+      setSplashReady(true);
+    }, SPLASH_DURATION_MS);
+
+    return () => {
+      listener.subscription.unsubscribe();
+      clearTimeout(splashTimer);
+    };
   }, []);
 
-  if (session === undefined) {
+  if (session === undefined || !splashReady) {
     return <SplashScreen />;
   }
 
