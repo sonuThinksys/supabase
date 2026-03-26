@@ -6,6 +6,7 @@ export const Routes = {
   CREATE_TASK: 'CreateTask',
   CREATE_PROJECT: 'CreateProject',
   CREATE_TAG: 'CreateTag',
+  TAGS_LIST: 'TagsList',
   LOGIN: 'Login',
   SIGNUP: 'Signup',
   MAIN_APP: 'MainApp',

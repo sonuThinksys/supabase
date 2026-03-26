@@ -5,6 +5,7 @@ import DashboardScreen from '../screens/Dashboard';
 import MyTasksScreen from '../screens/MyTasks';
 import CreateTaskScreen from '../screens/MyTasks/CreateTask';
 import CreateTagScreen from '../screens/Tags/CreateTags';
+import TagsListScreen from '../screens/Tags/TagsList';
 import ProjectsStack from './ProjectsStack';
 
 const Stack = createNativeStackNavigator<DashboardStackParamList>();
@@ -17,6 +18,7 @@ export default function DashboardStack() {
       <Stack.Screen name={Routes.PROJECTS} component={ProjectsStack} />
       <Stack.Screen name={Routes.CREATE_TASK} component={CreateTaskScreen} />
       <Stack.Screen name={Routes.CREATE_TAG} component={CreateTagScreen} />
+      <Stack.Screen name={Routes.TAGS_LIST} component={TagsListScreen} />
     </Stack.Navigator>
   );
 }
