@@ -1,0 +1,4 @@
+- Use Redux Toolkit
+- Avoid direct state mutation
+- Use selectors
+- Keep business logic in slices

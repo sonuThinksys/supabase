@@ -1,0 +1,3 @@
+- Use spacing scale: 8, 12, 16, 20, 24, 28, 32, 48
+- Use colors from theme/colors.ts
+- Dont use hardcode color in components, and pick from theme/colors.ts

@@ -1,0 +1,5 @@
+- Use axios for API calls
+- All responses must be typed
+- Handle errors with try/catch
+- Use async/await only (no .then)
+- Base URL from env config

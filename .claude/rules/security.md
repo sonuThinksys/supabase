@@ -1,0 +1,4 @@
+- Never log sensitive data
+- Validate all user inputs
+- Sanitize API payloads
+- Use secure storage for tokens
