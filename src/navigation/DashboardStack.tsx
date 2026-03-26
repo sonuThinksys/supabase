@@ -3,7 +3,7 @@ import { Routes } from './Routes';
 import { DashboardStackParamList } from './types';
 import DashboardScreen from '../screens/Dashboard';
 import MyTasksScreen from '../screens/MyTasks';
-import CreateTaskScreen from '../screens/MyTasks/CreateTaskScreen';
+import CreateTaskScreen from '../screens/MyTasks/CreateTask';
 import CreateTagScreen from '../screens/Tags/CreateTags';
 import ProjectsStack from './ProjectsStack';
 
