@@ -6,6 +6,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import Header from '../../../components/Header';
 import { Tag, fetchTagsForTask } from '../../../services/todoService';
 import { Colors } from '../../../theme/colors';
 import { TAGS_LIST_STRINGS } from './TagsList.constants';
@@ -58,7 +59,8 @@ export default function TagsList() {
 
   if (error) {
     return (
-      <View style={styles.emptyContainer}>
+      <View style={styles.errorContainer}>
+        <Header title={TAGS_LIST_STRINGS.TITLE} showBack />
         <Text style={styles.emptyText}>{error}</Text>
       </View>
     );
@@ -66,7 +68,7 @@ export default function TagsList() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{TAGS_LIST_STRINGS.TITLE}</Text>
+      <Header title={TAGS_LIST_STRINGS.TITLE} showBack />
       <FlatList
         data={tags}
         keyExtractor={keyExtractor}
