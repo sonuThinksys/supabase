@@ -108,4 +108,23 @@ export const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.subText,
   },
+  fab: {
+    position: 'absolute',
+    bottom: 24,
+    right: 16,
+    backgroundColor: Colors.primary,
+    borderRadius: 28,
+    paddingHorizontal: 20,
+    paddingVertical: 13,
+    elevation: 4,
+    shadowColor: Colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+  },
+  fabText: {
+    color: Colors.card,
+    fontWeight: '700',
+    fontSize: 14,
+  },
 });

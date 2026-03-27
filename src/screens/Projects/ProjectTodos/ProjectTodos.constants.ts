@@ -6,6 +6,7 @@ export const PROJECT_TODOS_STRINGS = {
   EMPTY: 'No todos found for this project.',
   STATUS_COMPLETED: 'Completed',
   STATUS_PENDING: 'Pending',
+  FAB_MEMBERS: '+ Members',
 };
 
 export const PRIORITY_COLOR: Record<'low' | 'medium' | 'high', string> = {

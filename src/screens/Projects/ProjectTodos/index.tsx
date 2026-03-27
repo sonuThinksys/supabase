@@ -10,9 +10,11 @@ import {
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 import { ProjectsStackParamList } from '../../../navigation/types';
+import { Routes } from '../../../navigation/Routes';
 import { Colors } from '../../../theme/colors';
 import Header from '../../../components/Header';
 import { fetchTodosByProject } from '../../../services/todoService';
+import { useAppSelector } from '../../../store/hooks';
 import { styles } from './ProjectTodos.styles';
 import { PRIORITY_COLOR, PROJECT_TODOS_STRINGS } from './ProjectTodos.constants';
 
@@ -29,8 +31,14 @@ type Props = {
   route: RouteProp<ProjectsStackParamList, 'ProjectTodos'>;
 };
 
-export default function ProjectTodosScreen({ route }: Props) {
+export default function ProjectTodosScreen({ navigation, route }: Props) {
   const { projectId, projectName } = route.params;
+  const role = useAppSelector(state => state.user.role);
+  const isAdmin = role === 'admin';
+
+  const onPressAddMember = useCallback(() => {
+    navigation.navigate(Routes.ADD_PROJECT_MEMBER, { projectId, projectName });
+  }, [navigation, projectId, projectName]);
 
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -90,6 +98,11 @@ export default function ProjectTodosScreen({ route }: Props) {
     <>
       <Header title={projectName} showBack/>
       <View style={styles.container}>
+        {isAdmin && (
+          <TouchableOpacity style={styles.fab} onPress={onPressAddMember} activeOpacity={0.85}>
+            <Text style={styles.fabText}>{PROJECT_TODOS_STRINGS.FAB_MEMBERS}</Text>
+          </TouchableOpacity>
+        )}
         {loading ? (
           <View style={styles.loaderContainer}>
             <ActivityIndicator size="large" color={Colors.primary} />

@@ -11,4 +11,5 @@ export const Routes = {
   SIGNUP: 'Signup',
   MAIN_APP: 'MainApp',
   AUTH: 'Auth',
+  ADD_PROJECT_MEMBER: 'AddProjectMember',
 } as const;

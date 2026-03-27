@@ -10,6 +10,7 @@ export type ProjectsStackParamList = {
   [Routes.PROJECTS]: undefined;
   [Routes.CREATE_PROJECT]: undefined;
   [Routes.PROJECT_TODOS]: { projectId: string; projectName: string };
+  [Routes.ADD_PROJECT_MEMBER]: { projectId: string; projectName: string };
 };
 
 export type DashboardStackParamList = {
