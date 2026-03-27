@@ -37,6 +37,7 @@ export const styles = StyleSheet.create({
   },
   listContent: {
     paddingBottom: 80,
+    flexGrow: 1,
   },
   card: {
     flex: 1,
@@ -81,5 +82,14 @@ export const styles = StyleSheet.create({
     color: Colors.card,
     fontSize: 24,
     lineHeight: 28,
+  },
+   emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyText: {
+    color: Colors.subText,
+    fontSize: 14,
   },
 });

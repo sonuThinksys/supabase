@@ -40,7 +40,7 @@ export default function ResolveTask({ task, visible, onClose, onResolved }: Prop
     if (!task) return;
     setLoading(true);
     try {
-      await resolveTask(task.id);
+      await resolveTask(task.id, note);
       setNote('');
       onResolved(task.id);
     } catch {
@@ -51,7 +51,7 @@ export default function ResolveTask({ task, visible, onClose, onResolved }: Prop
     } finally {
       setLoading(false);
     }
-  }, [task, onResolved]);
+  }, [task,note, onResolved]);
 
   const handleClose = useCallback(() => {
     setNote('');

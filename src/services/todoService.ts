@@ -1,5 +1,45 @@
 import { supabase } from "../supabase/client";
 
+export const fetchUserTodos = async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+  const result = await supabase
+    .from('todos')
+    .select('id, title, status, priority, created_at, subtasks(id, title, is_completed)')
+    .eq('user_id', user?.id)
+    .order('created_at', { ascending: false });
+  if (result.error) {
+    console.log('fetchUserTodos error:', result.error.message);
+    return { data: null, error: result.error };
+  }
+  return result;
+};
+
+// export const fetchAllTodos = async () => {
+//   const result = await supabase
+//     .from('todos')
+//     .select('id, title, status, priority, created_at, user_id, subtasks(id, title, is_completed), profiles(email)')
+//     .order('created_at', { ascending: false });
+//   if (result.error) {
+//     console.log('fetchAllTodos error:', result.error.message);
+//     return { data: null, error: result.error };
+//   }
+//   return result;
+// };
+
+export const fetchAllTodos = async () => {
+  const { data, error } = await supabase
+    .from('todos')
+    .select('id, title, status, priority, created_at, subtasks(id, title, is_completed)')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.log('fetchAllTodos error:', error.message);
+    return { data: null, error };
+  }
+
+  return { data, error: null };
+};
+
 export interface Project {
   id: string;
   name: string;
@@ -24,8 +64,6 @@ export const fetchTagsForTask = async (): Promise<Tag[]> => {
 
 export const createProject = async (name: string) => {
     const { data: { user } } = await supabase.auth.getUser();
-  console.log("user=========", user);
-  console.log("name=========", name);
     const { data, error } = await supabase
       .from('projects')
       .insert([
@@ -182,7 +220,23 @@ export const createProject = async (name: string) => {
     return result;
   };
 
-  export const resolveTask = async (taskId: string): Promise<void> => {
+  export const addComment = async ({
+    todoId,
+    content,
+  }: {
+    todoId: string;
+    content: string;
+  }): Promise<void> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    const { error } = await supabase
+      .from('comments')
+      .insert([{ todo_id: todoId, content, user_id: user?.id }]);
+    if (error) {
+      throw new Error(error.message);
+    }
+  };
+
+  export const resolveTask = async (taskId: string, note?: string): Promise<void> => {
     const { error } = await supabase
       .from('todos')
       .update({ status: 'completed' })
@@ -190,7 +244,10 @@ export const createProject = async (name: string) => {
     if (error) {
       throw new Error(error.message);
     }
-    
+    const commentContent = note?.trim()
+      ? note.trim()
+      : 'Task marked as resolved.';
+    await addComment({ todoId: taskId, content: commentContent });
   };
 
   export const fetchProjectsService = async () => {
@@ -206,4 +263,28 @@ export const createProject = async (name: string) => {
       return null;
     }
     return result
+  }
+
+  export const fetchSubtasksForTodo = async (todoId: string) => {
+    const result = await supabase
+      .from('subtasks')
+      .select('id, title, status')
+      .eq('todo_id', todoId)
+      .order('created_at', { ascending: true });
+
+    if (result.error) {
+      console.log('fetchSubtasksForTodo error:', result.error.message);
+      return null;
+    }
+    return result;
+  };
+
+  export const toggleSubtaskStatus = async (subtaskId: string, isCompleted: boolean) => {
+    const { error } = await supabase
+      .from('subtasks')
+      .update({ is_completed: isCompleted  })
+      .eq('id', subtaskId);
+    if (error) {
+      console.log('toggleSubtaskStatus error:', error.message);
+    }
   }

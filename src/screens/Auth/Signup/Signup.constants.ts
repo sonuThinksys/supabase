@@ -1,6 +1,7 @@
 export const SIGNUP_STRINGS = {
   TITLE: 'Create an account',
   SUBTITLE: 'Sign up to get started for free.\nNo credit card required.',
+  NAME_PLACEHOLDER: 'Full Name',
   EMAIL_PLACEHOLDER: 'Email',
   PASSWORD_PLACEHOLDER: 'Password',
   BUTTON_IDLE: 'Create Account',
