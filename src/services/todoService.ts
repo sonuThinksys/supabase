@@ -14,6 +14,32 @@ export const fetchUserTodos = async () => {
   return result;
 };
 
+// export const fetchAllTodos = async () => {
+//   const result = await supabase
+//     .from('todos')
+//     .select('id, title, status, priority, created_at, user_id, subtasks(id, title, is_completed), profiles(email)')
+//     .order('created_at', { ascending: false });
+//   if (result.error) {
+//     console.log('fetchAllTodos error:', result.error.message);
+//     return { data: null, error: result.error };
+//   }
+//   return result;
+// };
+
+export const fetchAllTodos = async () => {
+  const { data, error } = await supabase
+    .from('todos')
+    .select('id, title, status, priority, created_at, subtasks(id, title, is_completed)')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.log('fetchAllTodos error:', error.message);
+    return { data: null, error };
+  }
+
+  return { data, error: null };
+};
+
 export interface Project {
   id: string;
   name: string;

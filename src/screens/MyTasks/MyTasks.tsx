@@ -14,7 +14,8 @@ import { Routes } from '../../navigation/Routes';
 import Header from '../../components/Header';
 import TaskItem from './TaskItem';
 import ResolveTask from './ResolveTask';
-import { fetchUserTodos } from '../../services/todoService';
+import { fetchUserTodos, fetchAllTodos } from '../../services/todoService';
+import { useAppSelector } from '../../store/hooks';
 import { styles } from './MyTasks.styles';
 import { MY_TASKS_STRINGS, FilterType } from './MyTasks.constants';
 
@@ -29,6 +30,8 @@ export default function MyTasksScreen() {
   const [selectedTask, setSelectedTask] = useState<any | null>(null);
   const resolveRefs = useRef<Record<string, (() => void) | null>>({});
   const closeRefs = useRef<Record<string, (() => void) | null>>({});
+  const role = useAppSelector(state => state.user.role);
+  const isAdmin = role === 'admin';
 
   const filteredTasks = tasks.filter(
     item => filter === 'all' || item.status === filter,
@@ -36,10 +39,12 @@ export default function MyTasksScreen() {
 
   const fetchTasks = useCallback(async (refreshing = false) => {
     if (!refreshing) { setLoading(true); }
-    const result = await fetchUserTodos();
+    const result = isAdmin
+      ? await fetchAllTodos()
+      : await fetchUserTodos();
     setTasks(result?.data ?? []);
     if (!refreshing) { setLoading(false); }
-  }, []);
+  }, [isAdmin]);
 
   useEffect(() => {
     if (isFocused) { fetchTasks(); }
@@ -96,6 +101,7 @@ export default function MyTasksScreen() {
   const renderItem: ListRenderItem<any> = useCallback(({ item }) => (
     <TaskItem
       item={item}
+      isAdmin={isAdmin}
       onDelete={deleteTodo}
       onResolve={onOpenResolve}
       resolveRef={{
@@ -107,23 +113,26 @@ export default function MyTasksScreen() {
         set current(fn) { closeRefs.current[item.id] = fn; },
       }}
     />
-  ), [deleteTodo, onOpenResolve]);
+  ), [deleteTodo, isAdmin, onOpenResolve]);
 
-  const renderEmpty = useCallback(() => (
-    <View style={styles.emptyContainer}>
+  const renderEmpty = useCallback(() => {
+    if(loading) return null;
+    return <View style={styles.emptyContainer}>
       <Text style={styles.emptyText}>{MY_TASKS_STRINGS.EMPTY}</Text>
     </View>
-  ), []);
+  }, [loading]);
 
   return (
     <>
       <Header title={MY_TASKS_STRINGS.HEADER_TITLE} />
-      <ResolveTask
-        visible={showResolve}
-        task={selectedTask}
-        onClose={onCloseResolve}
-        onResolved={onResolved}
-      />
+      {isAdmin && (
+        <ResolveTask
+          visible={showResolve}
+          task={selectedTask}
+          onClose={onCloseResolve}
+          onResolved={onResolved}
+        />
+      )}
       {loading && (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={Colors.primary} />
@@ -163,6 +172,7 @@ export default function MyTasksScreen() {
           onRefresh={onRefresh}
           refreshing={isRefreshing}
           showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContent}
         />
       </View>
     </>

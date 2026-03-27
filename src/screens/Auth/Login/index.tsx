@@ -50,7 +50,7 @@ export default function LoginScreen({ navigation }: Props) {
     setLoading(true);
     try {
       await signInWithEmail(email.trim(), password);
-      navigation.navigate(Routes.MAIN_APP);
+      // Navigation handled automatically by session state in AppNavigator
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : AUTH_COMMON_STRINGS.ALERT_ERROR_FALLBACK;
       Alert.alert(LOGIN_STRINGS.ALERT_SIGNIN_FAILED, message);

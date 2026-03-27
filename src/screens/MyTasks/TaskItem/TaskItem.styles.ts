@@ -38,11 +38,14 @@ export const styles = StyleSheet.create({
   },
 
   // ── Task card ─────────────────────────────────────────────
+  cardContainer: {
+    marginBottom: 12,
+  },
   card: {
     backgroundColor: Colors.card,
     borderRadius: 8,
     marginHorizontal: 5,
-    marginBottom: 8,
+    // marginBottom: 8,
     paddingVertical: 12,
     paddingHorizontal: 16,
     shadowColor: Colors.shadow,
@@ -112,5 +115,21 @@ export const styles = StyleSheet.create({
     fontSize: 11,
     color: Colors.primary,
     fontWeight: '700',
+  },
+  // ── Owner badge (admin view) ───────────────────────────────
+  ownerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 6,
+  },
+  ownerLabel: {
+    fontSize: 11,
+    color: Colors.iconGray,
+    marginRight: 4,
+  },
+  ownerEmail: {
+    fontSize: 11,
+    color: Colors.primary,
+    fontWeight: '600',
   },
 });

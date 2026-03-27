@@ -5,6 +5,7 @@ import { useNavigation, useNavigationState } from '@react-navigation/native';
 import { Routes } from './Routes';
 import { Colors } from '../theme/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAppSelector } from '../store/hooks';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -76,7 +77,14 @@ export default function CustomDrawerContent() {
   const insets       = useSafeAreaInsets();
   const [user, setUser] = useState<any>(null);
   const activeRoute  = useNavigationState(getActiveRoute);
-
+  const role = useAppSelector(state => state.user.role);
+  const isAdmin = role === 'admin';
+  const FilterMenuItems = MENU_ITEMS.filter(item => {
+    if (item.route === Routes.CREATE_TAG || item.route === Routes.TAGS_LIST) {
+      return isAdmin; 
+    }
+    return true;
+  });
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       setUser(data.user);
@@ -84,16 +92,13 @@ export default function CustomDrawerContent() {
   }, []);
   const onSelectItem = useCallback((route: string) => {
     if (route === Routes.DASHBOARD) {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: Routes.MAIN_APP as never, params: { screen: Routes.DASHBOARD } }],
-      });
+      // Reset DashboardStack back to its root screen
+      navigation.navigate(Routes.DASHBOARD, { screen: Routes.DASHBOARD });
     } else {
-      navigation.navigate(Routes.MAIN_APP, {
-        screen: Routes.DASHBOARD,
-        params: { screen: route },
-      });
+      // Navigate to a nested screen inside DashboardStack
+      navigation.navigate(Routes.DASHBOARD, { screen: route });
     }
+    navigation.closeDrawer();
   }, [navigation]);
 
   const onLogout = useCallback(() => {
@@ -124,7 +129,7 @@ export default function CustomDrawerContent() {
       <View style={styles.divider} />
       {/* Menu */}
       <FlatList
-        data={MENU_ITEMS}
+        data={FilterMenuItems}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         style={styles.menuList}
@@ -134,7 +139,7 @@ export default function CustomDrawerContent() {
 
       {/* Logout */}
       <View style={styles.logoutContainer}>
-        <Button title={DRAWER_STRINGS.LOGOUT} onPress={onLogout} />
+        <Button color={Colors.primary} title={DRAWER_STRINGS.LOGOUT} onPress={onLogout} />
       </View>
     </View>
   );

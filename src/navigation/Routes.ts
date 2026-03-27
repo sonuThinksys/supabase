@@ -10,4 +10,5 @@ export const Routes = {
   LOGIN: 'Login',
   SIGNUP: 'Signup',
   MAIN_APP: 'MainApp',
+  AUTH: 'Auth',
 } as const;

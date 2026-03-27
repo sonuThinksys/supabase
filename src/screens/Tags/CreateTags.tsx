@@ -27,9 +27,7 @@ export default function CreateTagScreen({ navigation }: { navigation: any }) {
       if (newTag) {
         setTags([...tags, newTag]);
         setTag('');
-        navigation.navigate(Routes.MAIN_APP, {
-          screen: Routes.DASHBOARD
-        });
+        navigation.navigate(Routes.TAGS_LIST);
       }
      } catch (error) {
       console.log("error=========", error);

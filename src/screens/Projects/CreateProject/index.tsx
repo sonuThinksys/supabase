@@ -6,6 +6,7 @@ import Header from '../../../components/Header';
 import { createProject } from '../../../services/todoService';
 import { styles } from './CreateProject.styles';
 import { CREATE_PROJECT_STRINGS } from './CreateProject.constants';
+import { useAppSelector } from '../../../store/hooks';
 
 type Props = {
   navigation: NativeStackNavigationProp<ProjectsStackParamList>;
@@ -14,7 +15,8 @@ type Props = {
 export default function CreateProjectScreen({ navigation }: Props) {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
-
+  const role = useAppSelector(state => state.user.role);
+  const isAdmin = role === 'admin';
   const handleCreate = useCallback(async () => {
     if (!name.trim()) {
       Alert.alert(
@@ -56,18 +58,19 @@ export default function CreateProjectScreen({ navigation }: Props) {
             onChangeText={setName}
             style={styles.input}
           />
-          <TouchableOpacity
-            style={[styles.button, loading && styles.buttonDisabled]}
-            onPress={handleCreate}
-            disabled={loading}
-            activeOpacity={0.85}
-          >
+          {isAdmin && (
+            <TouchableOpacity
+              style={[styles.button, loading && styles.buttonDisabled]}
+              onPress={handleCreate}
+              disabled={loading}
+              activeOpacity={0.85}
+            >
             <Text style={styles.buttonText}>
               {loading
                 ? CREATE_PROJECT_STRINGS.BUTTON_LOADING
                 : CREATE_PROJECT_STRINGS.BUTTON_IDLE}
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity>)}
         </View>
       </View>
     </>

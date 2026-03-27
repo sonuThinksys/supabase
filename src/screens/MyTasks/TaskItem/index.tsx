@@ -21,6 +21,7 @@ interface Subtask {
 
 type Props = {
   item: any;
+  isAdmin?: boolean;
   onDelete: (id: string) => void;
   onResolve: (item: any) => void;
   resolveRef?: React.MutableRefObject<(() => void) | null>;
@@ -55,7 +56,7 @@ function SubtaskRow({ subtask, onToggle }: SubtaskRowProps) {
 
 // ── TaskItem ──────────────────────────────────────────────────────────────────
 
-export default function TaskItem({ item, onDelete, onResolve, resolveRef, closeRef }: Props) {
+export default function TaskItem({ item, isAdmin = false, onDelete, onResolve, resolveRef, closeRef }: Props) {
   const translateX = useRef(new Animated.Value(0)).current;
   const swipeableRef = useRef<Swipeable>(null);
   const heightAnim = useRef(new Animated.Value(0)).current;
@@ -121,18 +122,25 @@ export default function TaskItem({ item, onDelete, onResolve, resolveRef, closeR
       <TouchableOpacity style={styles.deleteBox} onPress={handleDelete}>
         <Text style={styles.deleteText}>{TASK_ITEM_STRINGS.DELETE}</Text>
       </TouchableOpacity>
-      {item.status === 'pending' && (
+      {isAdmin && item.status === 'pending' && (
         <TouchableOpacity style={styles.resolveBox} onPress={handleResolve}>
           <Text style={styles.resolveText}>{TASK_ITEM_STRINGS.MARK_RESOLVED}</Text>
         </TouchableOpacity>
       )}
     </View>
   );
+  const ownerEmail: string | undefined = item.profiles?.email;
 
   const cardContent = (
     <Animated.View style={[styles.card, { transform: [{ translateX }] }]}>
       {/* ── Todo title ── */}
       <Text style={styles.title}>{item.title}</Text>
+      {isAdmin && ownerEmail ? (
+        <View style={styles.ownerRow}>
+          <Text style={styles.ownerLabel}>{TASK_ITEM_STRINGS.CREATED_BY}</Text>
+          <Text style={styles.ownerEmail}>{ownerEmail}</Text>
+        </View>
+      ) : null}
 
       {/* ── Subtask list ── */}
       {subtasks.length > 0 && (
@@ -164,7 +172,7 @@ export default function TaskItem({ item, onDelete, onResolve, resolveRef, closeR
   }
 
   return (
-    <View onLayout={onContainerLayout}>
+    <View style={styles.cardContainer} onLayout={onContainerLayout}>
       <Swipeable ref={swipeableRef} renderRightActions={renderRightActions}>
         {cardContent}
       </Swipeable>

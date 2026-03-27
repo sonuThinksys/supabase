@@ -12,13 +12,14 @@ import { supabase } from '../../supabase/client';
 import Header from '../../components/Header';
 import { Colors } from '../../theme/colors';
 import { Routes } from '../../navigation/Routes';
-import { fetchUserTodos } from '../../services/todoService';
+import { fetchAllTodos } from '../../services/todoService';
 import { styles } from './Dashboard.styles';
 import {
   DASHBOARD_STRINGS,
   RECENT_TASKS_LIMIT,
   PRIORITY_DOT_COLOR,
 } from './Dashboard.constants';
+import { useAppSelector } from '../../store/hooks';
 
 interface Todo {
   id: string;
@@ -71,10 +72,9 @@ export default function DashboardScreen() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-
   const fetchTodos = useCallback(async (isRefreshing = false) => {
     if (!isRefreshing) { setLoading(true); }
-    const result = await fetchUserTodos();
+    const result = await fetchAllTodos();
     setTodos((result?.data as Todo[]) ?? []);
     if (!isRefreshing) { setLoading(false); }
   }, []);

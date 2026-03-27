@@ -9,6 +9,7 @@ export const styles = StyleSheet.create({
   },
   listContent: {
     paddingBottom: 24,
+    flexGrow: 1,
   },
   loaderContainer: {
     flex: 1,

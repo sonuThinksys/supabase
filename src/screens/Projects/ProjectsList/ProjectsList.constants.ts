@@ -4,4 +4,5 @@ export const PROJECTS_STRINGS = {
   TASK_LABEL: (count: number) => (count === 1 ? 'Task' : 'Tasks'),
   ERROR_LOAD: 'Failed to load projects. Please try again.',
   RETRY: 'Retry',
+  EMPTY: 'No projects found. Create your first project!',
 };

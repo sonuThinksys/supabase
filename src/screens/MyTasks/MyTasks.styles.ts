@@ -64,4 +64,7 @@ export const styles = StyleSheet.create({
     fontSize: 24,
     lineHeight: 28,
   },
+  listContent: {  
+    flexGrow: 1,
+  },
 });

@@ -27,9 +27,27 @@ export const signInWithEmail = async (email: string, password: string): Promise<
   }
 };
 
-export const signUpWithEmail = async (email: string, password: string): Promise<void> => {
-  const { error } = await supabase.auth.signUp({ email, password });
+export const signUpWithEmail = async (name: string, email: string, password: string): Promise<void> => {
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { name },
+    },
+  });
   if (error) {
     throw new Error(getFriendlyAuthError(error.message, error.status));
   }
+};
+
+export const fetchUserRole = async (): Promise<'admin' | 'user'> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return 'user';
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+  if (error || !data?.role) return 'user';
+  return data.role as 'admin' | 'user';
 };
