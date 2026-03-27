@@ -287,4 +287,57 @@ export const createProject = async (name: string) => {
     if (error) {
       console.log('toggleSubtaskStatus error:', error.message);
     }
+  };
+
+export interface Profile {
+  id: string;
+  email: string;
+}
+
+export const fetchProfiles = async (): Promise<Profile[]> => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, email')
+    .order('email', { ascending: true });
+  if (error) {
+    console.log('fetchProfiles error:', error.message);
+    return [];
   }
+  return data ?? [];
+};
+
+export type MemberRole = 'admin' | 'member' | 'viewer';
+
+export interface ProjectMember {
+  id: string;
+  user_id: string;
+  role: MemberRole;
+  created_at: string;
+  profiles: { email: string };
+}
+
+export const fetchProjectMembers = async (projectId: string): Promise<ProjectMember[]> => {
+  const { data, error } = await supabase
+    .from('project_members')
+    .select('id, user_id, role, created_at, profiles(email)')
+    .eq('project_id', projectId)
+    .order('created_at', { ascending: true });
+  if (error) {
+    console.log('fetchProjectMembers error:', error.message);
+    return [];
+  }
+  return (data ?? []) as ProjectMember[];
+};
+
+export const addProjectMember = async (
+  projectId: string,
+  userId: string,
+  role: MemberRole,
+): Promise<void> => {
+  const { error } = await supabase
+    .from('project_members')
+    .insert([{ project_id: projectId, user_id: userId, role }]);
+  if (error) {
+    throw new Error(error.message);
+  }
+};
