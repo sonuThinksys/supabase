@@ -12,42 +12,57 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Setup Node
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'yarn'
 
+      # Install dependencies
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      # Setup Java
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
+      # Cache Gradle (IMPROVED KEY)
       - name: Cache Gradle
         uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*') }}
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ runner.os }}
 
+      # Install Fastlane (FASTER + STABLE)
       - name: Install Fastlane
-        run: sudo gem install fastlane
+        run: |
+          sudo gem install fastlane -NV
 
+      # Build APK using Fastlane
       - name: Build Release
         run: |
           cd android
           fastlane build_release
 
+      # Verify APK exists (DEBUG SAFETY)
+      - name: Verify APK
+        run: ls -la android/app/build/outputs/apk/release/
+
+      # Upload APK
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-release-apk
+          name: app-release-apk-${{ github.run_number }}
           path: android/app/build/outputs/apk/release/app-release.apk
