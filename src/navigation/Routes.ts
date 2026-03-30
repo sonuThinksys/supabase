@@ -10,4 +10,8 @@ export const Routes = {
   LOGIN: 'Login',
   SIGNUP: 'Signup',
   MAIN_APP: 'MainApp',
+  AUTH: 'Auth',
+  ADD_PROJECT_MEMBER: 'AddProjectMember',
+  TODO_DETAIL: 'TodoDetail',
+  VOICE_ASSISTANT: 'VoiceAssistant',
 } as const;

@@ -11,10 +11,14 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ProjectsStackParamList } from '../../../navigation/types';
 import { Routes } from '../../../navigation/Routes';
 import Header from '../../../components/Header';
-import { fetchProjectsService } from '../../../services/todoService';
+import {
+  fetchProjectsService,
+  fetchAssignedProjectsService,
+} from '../../../services/taskService';
 import { Colors } from '../../../theme/colors';
 import { styles } from './ProjectsList.styles';
 import { PROJECTS_STRINGS } from './ProjectsList.constants';
+import { useAppSelector } from '../../../store/hooks';
 
 interface Project {
   id: string;
@@ -53,18 +57,26 @@ export default function ProjectsScreen({ navigation }: Props) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const role = useAppSelector(state => state.user.role);
+  const userId = useAppSelector(state => state.user.userId);
+  const isAdmin = role === 'admin';
 
-  const fetchProjects = useCallback(async () => {
-    setLoading(true);
+  const fetchProjects = useCallback(async (isRefreshing = false) => {
+    !isRefreshing && setLoading(true);
     setError(null);
     try {
-      const result = await fetchProjectsService();
+      // Admin sees all projects; others see only their assigned projects
+      const result = isAdmin
+        ? await fetchProjectsService()
+        : await fetchAssignedProjectsService(userId ?? '');
+
       if (result?.data) {
         setProjects(
           result.data.map((item: any) => ({
             id: item.id,
             name: item.name,
-            tasks: item.todos[0]?.count ?? 0,
+            tasks: item.task?.[0]?.count ?? 0,
           })),
         );
       } else {
@@ -73,9 +85,9 @@ export default function ProjectsScreen({ navigation }: Props) {
     } catch {
       setError(PROJECTS_STRINGS.ERROR_LOAD);
     } finally {
-      setLoading(false);
+      !isRefreshing && setLoading(false);
     }
-  }, []);
+  }, [isAdmin, userId]);
 
   useEffect(() => {
     fetchProjects();
@@ -98,11 +110,22 @@ export default function ProjectsScreen({ navigation }: Props) {
     [onPressProject],
   );
 
+    const renderEmpty = useCallback(() => (
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyText}>{PROJECTS_STRINGS.EMPTY}</Text>
+      </View>
+    ), []);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchProjects(true);
+    setRefreshing(false);
+  }, [fetchProjects]);
   const keyExtractor = useCallback((item: Project) => item.id, []);
 
   return (
     <>
-      <Header title={PROJECTS_STRINGS.HEADER_TITLE} />
+      <Header title={PROJECTS_STRINGS.HEADER_TITLE}/>
       <View style={styles.container}>
         {loading ? (
           <View style={styles.loaderContainer}>
@@ -121,13 +144,18 @@ export default function ProjectsScreen({ navigation }: Props) {
             keyExtractor={keyExtractor}
             numColumns={2}
             renderItem={renderItem}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
             contentContainerStyle={styles.listContent}
             showsVerticalScrollIndicator={false}
+            ListEmptyComponent={renderEmpty}
           />
         )}
-        <TouchableOpacity style={styles.fab} onPress={onPressCreate}>
-          <Text style={styles.fabText}>{PROJECTS_STRINGS.FAB_LABEL}</Text>
-        </TouchableOpacity>
+        {isAdmin && (
+          <TouchableOpacity style={styles.fab} onPress={onPressCreate}>
+            <Text style={styles.fabText}>{PROJECTS_STRINGS.FAB_LABEL}</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </>
   );

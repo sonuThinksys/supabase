@@ -3,9 +3,10 @@ import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ProjectsStackParamList } from '../../../navigation/types';
 import Header from '../../../components/Header';
-import { createProject } from '../../../services/todoService';
+import { createProject } from '../../../services/taskService';
 import { styles } from './CreateProject.styles';
 import { CREATE_PROJECT_STRINGS } from './CreateProject.constants';
+import { useAppSelector } from '../../../store/hooks';
 
 type Props = {
   navigation: NativeStackNavigationProp<ProjectsStackParamList>;
@@ -14,7 +15,8 @@ type Props = {
 export default function CreateProjectScreen({ navigation }: Props) {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
-
+  const role = useAppSelector(state => state.user.role);
+  const isAdmin = role === 'admin';
   const handleCreate = useCallback(async () => {
     if (!name.trim()) {
       Alert.alert(
@@ -46,7 +48,7 @@ export default function CreateProjectScreen({ navigation }: Props) {
 
   return (
     <>
-      <Header title={CREATE_PROJECT_STRINGS.HEADER_TITLE} />
+      <Header title={CREATE_PROJECT_STRINGS.HEADER_TITLE}  showBack/>
       <View style={styles.container}>
         <Text style={styles.label}>{CREATE_PROJECT_STRINGS.LABEL}</Text>
         <View style={styles.content}>
@@ -56,18 +58,19 @@ export default function CreateProjectScreen({ navigation }: Props) {
             onChangeText={setName}
             style={styles.input}
           />
-          <TouchableOpacity
-            style={[styles.button, loading && styles.buttonDisabled]}
-            onPress={handleCreate}
-            disabled={loading}
-            activeOpacity={0.85}
-          >
+          {isAdmin && (
+            <TouchableOpacity
+              style={[styles.button, loading && styles.buttonDisabled]}
+              onPress={handleCreate}
+              disabled={loading}
+              activeOpacity={0.85}
+            >
             <Text style={styles.buttonText}>
               {loading
                 ? CREATE_PROJECT_STRINGS.BUTTON_LOADING
                 : CREATE_PROJECT_STRINGS.BUTTON_IDLE}
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity>)}
         </View>
       </View>
     </>

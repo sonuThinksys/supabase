@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { Colors } from '../../theme/colors';
 import Header from '../../components/Header';
-import { createTag } from '../../services/todoService';
+import { createTag } from '../../services/taskService';
 import { Routes } from '../../navigation/Routes';
 export default function CreateTagScreen({ navigation }: { navigation: any }) {
   const [tag, setTag] = useState<string>('');
@@ -27,9 +27,7 @@ export default function CreateTagScreen({ navigation }: { navigation: any }) {
       if (newTag) {
         setTags([...tags, newTag]);
         setTag('');
-        navigation.navigate(Routes.MAIN_APP, {
-          screen: Routes.DASHBOARD
-        });
+        navigation.navigate(Routes.TAGS_LIST);
       }
      } catch (error) {
       console.log("error=========", error);

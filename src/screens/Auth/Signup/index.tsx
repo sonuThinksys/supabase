@@ -4,9 +4,10 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Routes } from '../../../navigation/Routes';
 import { RootStackParamList } from '../../../navigation/types';
 import { signUpWithEmail } from '../../../services/authService';
-import { validateAuthForm, AUTH_COMMON_STRINGS } from '../../../utils/authValidation';
+import { validateSignUpForm, AUTH_COMMON_STRINGS } from '../../../utils/authValidation';
 import AuthCard from '../../../components/auth/AuthCard';
 import AuthHeader from '../../../components/auth/AuthHeader';
+import AuthNameInput from '../../../components/auth/AuthNameInput';
 import AuthEmailInput from '../../../components/auth/AuthEmailInput';
 import AuthPasswordInput from '../../../components/auth/AuthPasswordInput';
 import AuthSubmitButton from '../../../components/auth/AuthSubmitButton';
@@ -18,6 +19,7 @@ type Props = {
 };
 
 export default function SignupScreen({ navigation }: Props) {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -25,22 +27,20 @@ export default function SignupScreen({ navigation }: Props) {
 
   const toggleShowPassword = useCallback(() => setShowPassword(p => !p), []);
 
-  // Defined first so signUp can reference it in its dependency array
   const onNavigateLogin = useCallback(
     () => navigation.navigate(Routes.LOGIN),
     [navigation],
   );
 
   const signUp = useCallback(async () => {
-    const validationError = validateAuthForm(email, password);
+    const validationError = validateSignUpForm(name, email, password);
     if (validationError) {
       Alert.alert(AUTH_COMMON_STRINGS.ALERT_VALIDATION_TITLE, validationError);
       return;
     }
     setLoading(true);
     try {
-      await signUpWithEmail(email.trim(), password);
-      // Navigate to Login after user acknowledges — email confirmation required
+      await signUpWithEmail(name.trim(), email.trim(), password);
       Alert.alert(
         SIGNUP_STRINGS.ALERT_SIGNUP_SUCCESS_TITLE,
         SIGNUP_STRINGS.ALERT_SIGNUP_SUCCESS_MSG,
@@ -52,7 +52,7 @@ export default function SignupScreen({ navigation }: Props) {
     } finally {
       setLoading(false);
     }
-  }, [email, password, onNavigateLogin]);
+  }, [name, email, password, onNavigateLogin]);
 
   return (
     <AuthCard>
@@ -60,6 +60,12 @@ export default function SignupScreen({ navigation }: Props) {
         iconName="user-plus"
         title={SIGNUP_STRINGS.TITLE}
         subtitle={SIGNUP_STRINGS.SUBTITLE}
+      />
+
+      <AuthNameInput
+        value={name}
+        onChangeText={setName}
+        placeholder={SIGNUP_STRINGS.NAME_PLACEHOLDER}
       />
 
       <AuthEmailInput

@@ -7,6 +7,7 @@ import CreateTaskScreen from '../screens/MyTasks/CreateTask';
 import CreateTagScreen from '../screens/Tags/CreateTags';
 import TagsListScreen from '../screens/Tags/TagsList';
 import ProjectsStack from './ProjectsStack';
+import VoiceAssistantScreen from '../screens/VoiceAssistant';
 
 const Stack = createNativeStackNavigator<DashboardStackParamList>();
 
@@ -19,6 +20,7 @@ export default function DashboardStack() {
       <Stack.Screen name={Routes.CREATE_TASK} component={CreateTaskScreen} />
       <Stack.Screen name={Routes.CREATE_TAG} component={CreateTagScreen} />
       <Stack.Screen name={Routes.TAGS_LIST} component={TagsListScreen} />
+      <Stack.Screen name={Routes.VOICE_ASSISTANT} component={VoiceAssistantScreen} />
     </Stack.Navigator>
   );
 }

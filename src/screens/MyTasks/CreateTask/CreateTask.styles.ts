@@ -86,4 +86,23 @@ export const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
+
+  // ── Validation ───────────────────────────────────────────────
+  inputError: {
+    borderWidth: 1.5,
+    borderColor: Colors.error,
+  },
+  errorText: {
+    fontSize: 12,
+    color: Colors.error,
+    marginTop: 4,
+    marginLeft: 2,
+  },
+  sectionError: {
+    borderWidth: 1.5,
+    borderColor: Colors.error,
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
 });
