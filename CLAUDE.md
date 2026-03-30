@@ -37,7 +37,7 @@ Route name constants live in `src/navigation/Routes.ts`. Navigation types are in
 ### Data Layer
 
 - **Supabase client** is a singleton in `src/supabase/client.ts`.
-- **Service functions** in `src/services/` abstract Supabase queries (auth in `authService.ts`, todos/projects/tags in `todoService.ts`).
+- **Service functions** in `src/services/` abstract Supabase queries (auth in `authService.ts`, task/projects/tags in `todoService.ts`).
 - Realtime subscriptions are set up directly in screens via Supabase channels (e.g., Dashboard).
 - No Redux or global state — screens use local `useState`. (Project rules mention Redux Toolkit but it is not implemented.)
 

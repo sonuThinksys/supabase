@@ -10,10 +10,11 @@ import {
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { DashboardStackParamList } from '../../../navigation/types';
-import { Project, Tag, fetchProjectsForTask, fetchTagsForTask, createFullTodo } from '../../../services/todoService';
+import { Project, Tag, fetchProjectsForTask, fetchTagsForTask, createFullTodo } from '../../../services/taskService';
 import Header from '../../../components/Header';
 import { styles } from './CreateTask.styles';
 import { CREATE_TASK_STRINGS, PRIORITIES, Priority } from './CreateTask.constants';
+import { useAppSelector } from '../../../store/hooks';
 
 export interface SubtaskItem {
   id: string;
@@ -78,6 +79,10 @@ function SubtaskRow({ item }: { item: SubtaskItem }) {
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function CreateTaskScreen({ navigation }: Props) {
+  const role = useAppSelector(state => state.user.role);
+  const userId = useAppSelector(state => state.user.userId);
+  const isAdmin = role === 'admin';
+
   const [title, setTitle] = useState('');
   const [projects, setProjects] = useState<Project[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
@@ -85,14 +90,22 @@ export default function CreateTaskScreen({ navigation }: Props) {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [subtasks, setSubtasks] = useState<SubtaskItem[]>([]);
   const [subtaskInput, setSubtaskInput] = useState('');
-  const [priority, setPriority] = useState<Priority>('low');
+  const [priority, setPriority] = useState<Priority | ''>('');
   const [loading, setLoading] = useState(false);
+
+  const [errors, setErrors] = useState({
+    title: '',
+    project: '',
+    priority: '',
+    tags: '',
+  });
 
   useEffect(() => {
     const loadData = async () => {
       try {
         const [projectsData, tagsData] = await Promise.all([
-          fetchProjectsForTask(),
+          // Admin sees all projects; others see only their assigned ones
+          fetchProjectsForTask(isAdmin, userId ?? ''),
           fetchTagsForTask(),
         ]);
         setProjects(projectsData);
@@ -102,17 +115,30 @@ export default function CreateTaskScreen({ navigation }: Props) {
       }
     };
     loadData();
+  }, [isAdmin, userId]);
+
+  const onChangeTitle = useCallback((value: string) => {
+    setTitle(value);
+    if (value.trim()) setErrors(prev => ({ ...prev, title: '' }));
   }, []);
 
-  const onSelectProject = useCallback((id: string) => setSelectedProject(id), []);
+  const onSelectProject = useCallback((id: string) => {
+    setSelectedProject(id);
+    setErrors(prev => ({ ...prev, project: '' }));
+  }, []);
 
   const onToggleTag = useCallback((id: string) => {
-    setSelectedTags(prev =>
-      prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id],
-    );
+    setSelectedTags(prev => {
+      const next = prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id];
+      if (next.length > 0) setErrors(e => ({ ...e, tags: '' }));
+      return next;
+    });
   }, []);
 
-  const onSelectPriority = useCallback((value: Priority) => setPriority(value), []);
+  const onSelectPriority = useCallback((value: Priority) => {
+    setPriority(value);
+    setErrors(prev => ({ ...prev, priority: '' }));
+  }, []);
 
   const onAddSubtask = useCallback(() => {
     const trimmed = subtaskInput.trim();
@@ -122,10 +148,17 @@ export default function CreateTaskScreen({ navigation }: Props) {
   }, [subtaskInput]);
 
   const handleCreate = useCallback(async () => {
-    if (!title.trim() || !selectedProject || !selectedTags.length) {
-      Alert.alert(CREATE_TASK_STRINGS.ERROR_TITLE, CREATE_TASK_STRINGS.ERROR_FILL_FIELDS);
-      return;
-    }
+    const newErrors = {
+      title: !title.trim() ? CREATE_TASK_STRINGS.VALIDATION_TITLE : '',
+      project: !selectedProject ? CREATE_TASK_STRINGS.VALIDATION_PROJECT : '',
+      priority: !priority ? CREATE_TASK_STRINGS.VALIDATION_PRIORITY : '',
+      tags: !selectedTags.length ? CREATE_TASK_STRINGS.VALIDATION_TAGS : '',
+    };
+    setErrors(newErrors);
+
+    const hasError = Object.values(newErrors).some(e => e !== '');
+    if (hasError) return;
+
     setLoading(true);
     try {
       await createFullTodo({
@@ -133,7 +166,7 @@ export default function CreateTaskScreen({ navigation }: Props) {
         projectId: selectedProject,
         subtasks: subtasks.map(s => s.title),
         tagIds: selectedTags,
-        priority,
+        priority: priority as Priority,
       });
       navigation.goBack();
     } catch {
@@ -164,16 +197,19 @@ export default function CreateTaskScreen({ navigation }: Props) {
 
   return (
     <>
-      <Header title={CREATE_TASK_STRINGS.HEADER_TITLE} />
+      <Header title={CREATE_TASK_STRINGS.HEADER_TITLE} showBack/>
       <View style={styles.container}>
         <View>
+          {/* Title */}
           <TextInput
             placeholder={CREATE_TASK_STRINGS.PLACEHOLDER_TITLE}
             value={title}
-            onChangeText={setTitle}
-            style={styles.input}
+            onChangeText={onChangeTitle}
+            style={[styles.input, !!errors.title && styles.inputError]}
           />
+          {!!errors.title && <Text style={styles.errorText}>{errors.title}</Text>}
 
+          {/* Project */}
           <View style={styles.section}>
             <Text style={styles.label}>{CREATE_TASK_STRINGS.LABEL_PROJECT}</Text>
             <FlatList
@@ -183,11 +219,13 @@ export default function CreateTaskScreen({ navigation }: Props) {
               renderItem={renderProjectItem}
               showsHorizontalScrollIndicator={false}
             />
+            {!!errors.project && <Text style={styles.errorText}>{errors.project}</Text>}
           </View>
 
+          {/* Priority */}
           <View style={styles.section}>
             <Text style={styles.label}>{CREATE_TASK_STRINGS.LABEL_PRIORITY}</Text>
-            <View style={styles.priorityRow}>
+            <View style={[styles.priorityRow, !!errors.priority && styles.sectionError]}>
               {PRIORITIES.map(p => (
                 <PriorityChip
                   key={p}
@@ -197,8 +235,10 @@ export default function CreateTaskScreen({ navigation }: Props) {
                 />
               ))}
             </View>
+            {!!errors.priority && <Text style={styles.errorText}>{errors.priority}</Text>}
           </View>
 
+          {/* Subtasks (optional) */}
           <Text style={styles.label}>{CREATE_TASK_STRINGS.LABEL_SUBTASKS}</Text>
           <View style={styles.row}>
             <TextInput
@@ -211,7 +251,6 @@ export default function CreateTaskScreen({ navigation }: Props) {
               <Text style={styles.addBtnText}>{CREATE_TASK_STRINGS.BTN_ADD}</Text>
             </TouchableOpacity>
           </View>
-
           <FlatList
             data={subtasks}
             keyExtractor={item => item.id}
@@ -219,6 +258,7 @@ export default function CreateTaskScreen({ navigation }: Props) {
             scrollEnabled={false}
           />
 
+          {/* Tags */}
           <View style={styles.section}>
             <Text style={styles.label}>{CREATE_TASK_STRINGS.LABEL_TAGS}</Text>
             <FlatList
@@ -228,13 +268,14 @@ export default function CreateTaskScreen({ navigation }: Props) {
               renderItem={renderTagItem}
               showsHorizontalScrollIndicator={false}
             />
+            {!!errors.tags && <Text style={styles.errorText}>{errors.tags}</Text>}
           </View>
         </View>
 
         <TouchableOpacity
           style={[styles.button, loading && styles.buttonDisabled]}
           onPress={handleCreate}
-          disabled={loading}
+          disabled={loading || projects.length === 0}
         >
           <Text style={styles.buttonText}>
             {loading ? CREATE_TASK_STRINGS.BTN_CREATING : CREATE_TASK_STRINGS.BTN_CREATE}

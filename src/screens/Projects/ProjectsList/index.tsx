@@ -11,7 +11,10 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ProjectsStackParamList } from '../../../navigation/types';
 import { Routes } from '../../../navigation/Routes';
 import Header from '../../../components/Header';
-import { fetchProjectsService } from '../../../services/todoService';
+import {
+  fetchProjectsService,
+  fetchAssignedProjectsService,
+} from '../../../services/taskService';
 import { Colors } from '../../../theme/colors';
 import { styles } from './ProjectsList.styles';
 import { PROJECTS_STRINGS } from './ProjectsList.constants';
@@ -56,18 +59,24 @@ export default function ProjectsScreen({ navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const role = useAppSelector(state => state.user.role);
+  const userId = useAppSelector(state => state.user.userId);
   const isAdmin = role === 'admin';
+
   const fetchProjects = useCallback(async (isRefreshing = false) => {
     !isRefreshing && setLoading(true);
     setError(null);
     try {
-      const result = await fetchProjectsService();
+      // Admin sees all projects; others see only their assigned projects
+      const result = isAdmin
+        ? await fetchProjectsService()
+        : await fetchAssignedProjectsService(userId ?? '');
+
       if (result?.data) {
         setProjects(
           result.data.map((item: any) => ({
             id: item.id,
             name: item.name,
-            tasks: item.todos[0]?.count ?? 0,
+            tasks: item.task?.[0]?.count ?? 0,
           })),
         );
       } else {
@@ -78,7 +87,7 @@ export default function ProjectsScreen({ navigation }: Props) {
     } finally {
       !isRefreshing && setLoading(false);
     }
-  }, []);
+  }, [isAdmin, userId]);
 
   useEffect(() => {
     fetchProjects();
@@ -116,7 +125,7 @@ export default function ProjectsScreen({ navigation }: Props) {
 
   return (
     <>
-      <Header title={PROJECTS_STRINGS.HEADER_TITLE} />
+      <Header title={PROJECTS_STRINGS.HEADER_TITLE}/>
       <View style={styles.container}>
         {loading ? (
           <View style={styles.loaderContainer}>
