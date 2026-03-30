@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
   TouchableWithoutFeedback,
 } from 'react-native';
-import { resolveTask } from '../../../services/todoService';
+import { resolveTask } from '../../../services/taskService';
 import { styles } from './ResolveTask.styles';
 import {
   PRIORITY_COLOR,

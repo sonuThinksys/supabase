@@ -1,7 +1,8 @@
 import { FlatList, StyleSheet, Text, TouchableOpacity, View, Button } from 'react-native';
 import { supabase } from '../supabase/client';
 import { useCallback, useEffect, useState } from 'react';
-import { useNavigation, useNavigationState } from '@react-navigation/native';
+import { useNavigationState } from '@react-navigation/native';
+import { DrawerContentComponentProps } from '@react-navigation/drawer';
 import { Routes } from './Routes';
 import { Colors } from '../theme/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -13,19 +14,20 @@ const DRAWER_STRINGS = {
   DASHBOARD: 'Dashboard',
   MY_TASKS: 'My Tasks',
   PROJECTS: 'Projects',
-  CREATE_TAG: 'Create Tag',
+  // CREATE_TAG: 'Create Tag',
   TAGS: 'Tags',
+  VOICE_ASSISTANT: '🎙️ Voice Assistant',
   LOGOUT: 'Logout',
 };
 
-type MenuItem = { label: string; route: string };
+type MenuItem = { label: string; route: string; adminOnly?: boolean };
 
 const MENU_ITEMS: MenuItem[] = [
-  { label: DRAWER_STRINGS.DASHBOARD,  route: Routes.DASHBOARD  },
-  { label: DRAWER_STRINGS.MY_TASKS,   route: Routes.MY_TASKS   },
-  { label: DRAWER_STRINGS.PROJECTS,   route: Routes.PROJECTS   },
-  { label: DRAWER_STRINGS.CREATE_TAG, route: Routes.CREATE_TAG },
-  { label: DRAWER_STRINGS.TAGS,       route: Routes.TAGS_LIST  },
+  { label: DRAWER_STRINGS.DASHBOARD,       route: Routes.DASHBOARD       },
+  { label: DRAWER_STRINGS.MY_TASKS,        route: Routes.MY_TASKS        },
+  { label: DRAWER_STRINGS.PROJECTS,        route: Routes.PROJECTS        },
+  { label: DRAWER_STRINGS.TAGS,            route: Routes.TAGS_LIST,       adminOnly: true },
+  { label: DRAWER_STRINGS.VOICE_ASSISTANT, route: Routes.VOICE_ASSISTANT },
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -72,17 +74,14 @@ function DrawerMenuItem({ item, isSelected, onSelect }: DrawerMenuItemProps) {
 
 // ─── CustomDrawerContent ──────────────────────────────────────────────────────
 
-export default function CustomDrawerContent() {
-  const navigation   = useNavigation<any>();
-  const insets       = useSafeAreaInsets();
+export default function CustomDrawerContent({ navigation }: DrawerContentComponentProps) {
+  const insets = useSafeAreaInsets();
   const [user, setUser] = useState<any>(null);
   const activeRoute  = useNavigationState(getActiveRoute);
   const role = useAppSelector(state => state.user.role);
   const isAdmin = role === 'admin';
   const FilterMenuItems = MENU_ITEMS.filter(item => {
-    if (item.route === Routes.CREATE_TAG || item.route === Routes.TAGS_LIST) {
-      return isAdmin; 
-    }
+    if (item.adminOnly) { return isAdmin; }
     return true;
   });
   useEffect(() => {

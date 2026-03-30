@@ -15,10 +15,8 @@ const SPLASH_DURATION_MS = 2000;
 
 export default function AppNavigator() {
   const dispatch = useAppDispatch();
-  // undefined = loading, null = no session, Session = authenticated
   const [session, setSession] = useState<Session | null | undefined>(undefined);
   const [splashReady, setSplashReady] = useState(false);
-
   const loadUserRole = async (currentSession: Session) => {
     const { data, error } = await supabase
       .from('profiles')

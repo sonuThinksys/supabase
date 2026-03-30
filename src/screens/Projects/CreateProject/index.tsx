@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ProjectsStackParamList } from '../../../navigation/types';
 import Header from '../../../components/Header';
-import { createProject } from '../../../services/todoService';
+import { createProject } from '../../../services/taskService';
 import { styles } from './CreateProject.styles';
 import { CREATE_PROJECT_STRINGS } from './CreateProject.constants';
 import { useAppSelector } from '../../../store/hooks';
@@ -48,7 +48,7 @@ export default function CreateProjectScreen({ navigation }: Props) {
 
   return (
     <>
-      <Header title={CREATE_PROJECT_STRINGS.HEADER_TITLE} />
+      <Header title={CREATE_PROJECT_STRINGS.HEADER_TITLE}  showBack/>
       <View style={styles.container}>
         <Text style={styles.label}>{CREATE_PROJECT_STRINGS.LABEL}</Text>
         <View style={styles.content}>

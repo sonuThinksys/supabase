@@ -21,7 +21,7 @@ import {
   MemberRole,
   Profile,
   ProjectMember,
-} from '../../../services/todoService';
+} from '../../../services/taskService';
 import { useAppSelector } from '../../../store/hooks';
 import { styles } from './AddProjectMember.styles';
 import { ADD_MEMBER_STRINGS, ROLE_OPTIONS } from './AddProjectMember.constants';
@@ -141,7 +141,7 @@ function MemberRow({ member }: { member: ProjectMember }) {
 // ── AddProjectMemberScreen ────────────────────────────────────────────────────
 
 export default function AddProjectMemberScreen({ navigation, route }: Props) {
-  const { projectId, projectName } = route.params;
+  const { projectId, projectName } = route.params || { projectId: '', projectName: '' };
   const role = useAppSelector(state => state.user.role);
   const isAdmin = role === 'admin';
 

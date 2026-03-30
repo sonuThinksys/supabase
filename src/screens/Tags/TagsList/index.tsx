@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native';
 import Header from '../../../components/Header';
-import { Tag, fetchTagsForTask } from '../../../services/todoService';
+import { Tag, fetchTagsForTask } from '../../../services/taskService';
 import { Colors } from '../../../theme/colors';
 import { TAGS_LIST_STRINGS } from './TagsList.constants';
 import { styles } from './TagsList.styles';

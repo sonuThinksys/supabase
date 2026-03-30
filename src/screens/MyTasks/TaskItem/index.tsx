@@ -7,7 +7,7 @@ import {
   LayoutChangeEvent,
 } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
-import { toggleSubtaskStatus } from '../../../services/todoService';
+import { toggleSubtaskStatus } from '../../../services/taskService';
 import { styles } from './TaskItem.styles';
 import { TASK_ITEM_STRINGS } from './TaskItem.constants';
 
@@ -133,7 +133,7 @@ export default function TaskItem({ item, isAdmin = false, onDelete, onResolve, r
 
   const cardContent = (
     <Animated.View style={[styles.card, { transform: [{ translateX }] }]}>
-      {/* ── Todo title ── */}
+      {/* ── Task title ── */}
       <Text style={styles.title}>{item.title}</Text>
       {isAdmin && ownerEmail ? (
         <View style={styles.ownerRow}>

@@ -14,7 +14,7 @@ import { Routes } from '../../navigation/Routes';
 import Header from '../../components/Header';
 import TaskItem from './TaskItem';
 import ResolveTask from './ResolveTask';
-import { fetchUserTodos, fetchAllTodos } from '../../services/todoService';
+import { fetchUserTodos, fetchAllTodos } from '../../services/taskService';
 import { useAppSelector } from '../../store/hooks';
 import { styles } from './MyTasks.styles';
 import { MY_TASKS_STRINGS, FilterType } from './MyTasks.constants';
@@ -50,11 +50,11 @@ export default function MyTasksScreen() {
     if (isFocused) { fetchTasks(); }
   }, [isFocused, fetchTasks]);
 
-  const deleteTodo = useCallback(async (id: string) => {
+  const deleteTask = useCallback(async (id: string) => {
     try {
-      await supabase.from('todos').delete().eq('id', id);
+      await supabase.from('task').delete().eq('id', id);
     } catch (error) {
-      console.log('deleteTodo error:', error);
+      console.log('deleteTask error:', error);
     }
   }, []);
 
@@ -102,7 +102,7 @@ export default function MyTasksScreen() {
     <TaskItem
       item={item}
       isAdmin={isAdmin}
-      onDelete={deleteTodo}
+      onDelete={deleteTask}
       onResolve={onOpenResolve}
       resolveRef={{
         get current() { return resolveRefs.current[item.id]; },
@@ -113,7 +113,7 @@ export default function MyTasksScreen() {
         set current(fn) { closeRefs.current[item.id] = fn; },
       }}
     />
-  ), [deleteTodo, isAdmin, onOpenResolve]);
+  ), [deleteTask, isAdmin, onOpenResolve]);
 
   const renderEmpty = useCallback(() => {
     if(loading) return null;

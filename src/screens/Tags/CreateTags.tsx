@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { Colors } from '../../theme/colors';
 import Header from '../../components/Header';
-import { createTag } from '../../services/todoService';
+import { createTag } from '../../services/taskService';
 import { Routes } from '../../navigation/Routes';
 export default function CreateTagScreen({ navigation }: { navigation: any }) {
   const [tag, setTag] = useState<string>('');
