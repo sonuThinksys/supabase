@@ -43,11 +43,13 @@ jobs:
           restore-keys: |
             gradle-${{ runner.os }}
 
-      # Install Fastlane and plugins via Bundler
-      - name: Install Fastlane
-        run: |
-          cd android
-          bundle install
+      # Setup Ruby + Bundler (required for Fastlane)
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: android
 
       # Build APK using Fastlane
       - name: Build Release
