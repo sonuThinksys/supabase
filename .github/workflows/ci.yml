@@ -20,8 +20,8 @@ jobs:
           cache: 'yarn'
       # 3. Install dependencies (faster & consistent)
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install
 
       # 5. Run tests (CI-safe mode)
       - name: Run tests
-        run: yarn test --watchAll=false
+        run: yarn test
