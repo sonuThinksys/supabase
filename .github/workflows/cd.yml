@@ -3,7 +3,7 @@ name: CD Pipeline
 on:
   workflow_dispatch:   # manual trigger
   push:
-    branches: [main]
+    branches: [develop]
 
 jobs:
   build:
