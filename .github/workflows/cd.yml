@@ -1,59 +1,65 @@
 name: CD Pipeline
 
 on:
-  workflow_dispatch:   # manual trigger
+  workflow_dispatch:
   push:
     branches: [develop]
-
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout
+      # Checkout
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      # 2. Setup Node
+      # Setup Node
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'yarn'
 
-      # 3. Install dependencies
+      # Install dependencies
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      # 4. Setup Java (REQUIRED for Android build)
+      # Setup Java
       - name: Setup Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      # 5. Cache Gradle (faster builds)
+      # Cache Gradle (IMPROVED KEY)
       - name: Cache Gradle
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*') }}
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ runner.os }}
 
-      # 6. Install Fastlane
+      # Install Fastlane (FASTER + STABLE)
       - name: Install Fastlane
-        run: sudo gem install fastlane
+        run: |
+          sudo gem install fastlane -NV
 
-      # 7. Run Fastlane build
+      # Build APK using Fastlane
       - name: Build Release
         run: |
           cd android
           fastlane build_release
 
-      # 8. Upload APK
+      # Verify APK exists (DEBUG SAFETY)
+      - name: Verify APK
+        run: ls -la android/app/build/outputs/apk/release/
+
+      # Upload APK
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-         name: app-release-apk
-         path: android/app/build/outputs/apk/release/app-release.apk
+          name: app-release-apk-${{ github.run_number }}
+          path: android/app/build/outputs/apk/release/app-release.apk
