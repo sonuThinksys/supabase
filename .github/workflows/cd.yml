@@ -1,9 +1,10 @@
-name: CI Pipeline
+
+name: CD Pipeline
 
 on:
+  workflow_dispatch:   # manual trigger
   push:
     branches: [main]
-  pull_request:
 
 jobs:
   build:
@@ -18,10 +19,11 @@ jobs:
         with:
           node-version: 20
           cache: 'yarn'
-      # 3. Install dependencies (faster & consistent)
+
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      # 5. Run tests (CI-safe mode)
-      - name: Run tests
-        run: yarn test --watchAll=false
+      - name: Build Release
+        run: |
+          cd android
+          fastlane build_release
