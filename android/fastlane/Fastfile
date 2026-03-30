@@ -1,0 +1,26 @@
+default_platform(:android)
+
+platform :android do
+
+  desc "Increment version and build APK"
+  lane :build_release do
+
+    # Increment version code
+    increment_version_code(
+      gradle_file_path: "app/build.gradle"
+    )
+
+    # Optional: Increment version name
+    increment_version_name(
+      gradle_file_path: "app/build.gradle",
+      version_name: get_version_name + ".1"
+    )
+
+    # Build APK
+    gradle(
+      task: "assembleRelease"
+    )
+
+  end
+
+end
