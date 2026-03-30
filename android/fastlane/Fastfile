@@ -6,14 +6,21 @@ platform :android do
   lane :build_release do
 
     # Increment version code
-    increment_version_code(
+    current_code = android_get_version_code(
+      gradle_file_path: "app/build.gradle"
+    ).to_i
+    android_set_version_code(
+      version_code: current_code + 1,
       gradle_file_path: "app/build.gradle"
     )
 
-    # Optional: Increment version name
-    increment_version_name(
-      gradle_file_path: "app/build.gradle",
-      version_name: get_version_name + ".1"
+    # Increment version name
+    current_name = android_get_version_name(
+      gradle_file_path: "app/build.gradle"
+    )
+    android_set_version_name(
+      version_name: current_name + ".1",
+      gradle_file_path: "app/build.gradle"
     )
 
     # Build APK
