@@ -1,9 +1,13 @@
 name: CD Pipeline
 
 on:
-  workflow_dispatch: 
+  workflow_dispatch:
   push:
     branches: [develop]
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
