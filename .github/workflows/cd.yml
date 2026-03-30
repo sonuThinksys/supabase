@@ -43,16 +43,17 @@ jobs:
           restore-keys: |
             gradle-${{ runner.os }}
 
-      # Install Fastlane
+      # Install Fastlane and plugins via Bundler
       - name: Install Fastlane
         run: |
-          sudo gem install fastlane -NV
+          cd android
+          bundle install
 
       # Build APK using Fastlane
       - name: Build Release
         run: |
           cd android
-          fastlane build_release
+          bundle exec fastlane build_release
 
       # Verify APK exists
       - name: Verify APK
