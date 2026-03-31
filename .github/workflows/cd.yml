@@ -71,3 +71,9 @@ jobs:
 
       - name: Verify APK
         run: ls -la android/app/build/outputs/apk/release/
+        # This step is crucial to ensure the APK was generated successfully before attempting to upload it.
+      - name: Upload APK
+        uses: actions/upload-artifact@v5
+        with:
+          name: app-release
+          path: android/app/build/outputs/apk/release/app-release.apk
