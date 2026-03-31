@@ -73,7 +73,7 @@ jobs:
       
       # Setup Ruby (Fastlane)
       - name: Setup Ruby
-        uses: ruby/setup-ruby@v5
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.2'
 
