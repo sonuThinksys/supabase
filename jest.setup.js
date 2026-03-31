@@ -62,21 +62,6 @@ jest.mock('@react-native-voice/voice', () => ({
   onSpeechError: jest.fn(),
 }));
 
-// Mocking react-native-tts to prevent errors during testing
-jest.mock('react-native-tts', () => ({
-  __esModule: true,
-  default: {
-    speak: jest.fn(),
-    stop: jest.fn(),
-    pause: jest.fn(),
-    resume: jest.fn(),
-    setDefaultLanguage: jest.fn(),
-    setDefaultRate: jest.fn(),
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-  },
-}));
-
 // Mocking react-native-gesture-handler to prevent errors during testing
 jest.mock('react-native-gesture-handler', () => ({
   Swipeable: 'Swipeable',

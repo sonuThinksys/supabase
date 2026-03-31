@@ -11,7 +11,6 @@ import {
   ListRenderItemInfo,
 } from 'react-native';
 import Voice, { SpeechErrorEvent, SpeechResultsEvent } from '@react-native-voice/voice';
-import Tts from 'react-native-tts';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { Colors } from '../../theme/colors';
 import { modalStyles as styles } from './Dashboard.styles';
@@ -294,7 +293,6 @@ export default function DashboardVoiceModal({
   const [transcript, setTranscript] = useState('');
   const [aiResponse, setAiResponse] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
   const [structuredData, setStructuredData] = useState<StructuredData | null>(null);
 
   const transcriptRef = useRef('');        // live partial (display fallback)
@@ -324,27 +322,6 @@ export default function DashboardVoiceModal({
     pulseAnim.setValue(1);
   }, [pulseAnim]);
 
-  // ── TTS listeners ────────────────────────────────────────────────────────
-
-  useEffect(() => {
-    const onStart = () => setIsSpeaking(true);
-    const onFinish = () => setIsSpeaking(false);
-    const onCancel = () => setIsSpeaking(false);
-    Tts.addEventListener('tts-start', onStart);
-    Tts.addEventListener('tts-finish', onFinish);
-    Tts.addEventListener('tts-cancel', onCancel);
-    return () => {
-      Tts?.removeEventListener('tts-start', onStart);
-      Tts?.removeEventListener('tts-finish', onFinish);
-      Tts?.removeEventListener('tts-cancel', onCancel);
-    };
-  }, []);
-
-  const onStopSpeaking = useCallback(() => {
-    try { Tts.stop(); } catch { /* safe */ }
-    setIsSpeaking(false);
-  }, []);
-
   // ── Silence timer ────────────────────────────────────────────────────────
 
   const clearSilenceTimer = useCallback(() => {
@@ -369,8 +346,6 @@ export default function DashboardVoiceModal({
       setIsListening(false);
       stopPulse();
     }
-    try { Tts.stop(); } catch { /* safe */ }
-    setIsSpeaking(false);
     setTranscript('');
     setAiResponse('');
     setStructuredData(null);
@@ -383,7 +358,6 @@ export default function DashboardVoiceModal({
 
   const submitQuery = useCallback(async (query: string) => {
     if (!query.trim() || isProcessingRef.current) { return; }
-    try { Tts.stop(); } catch { /* safe */ }
     setAiResponse('');
     setStructuredData(null);
     aiResponseRef.current = '';
@@ -396,7 +370,6 @@ export default function DashboardVoiceModal({
       };
       const onData = (data: StructuredData) => { setStructuredData(data); };
       await processVoiceQuery(query.trim(), userId, isAdmin, onToken, onData);
-      if (aiResponseRef.current.trim()) { Tts.speak(aiResponseRef.current); }
     } catch {
       setAiResponse(DASHBOARD_STRINGS.VOICE_ERROR);
     } finally {
@@ -414,7 +387,6 @@ export default function DashboardVoiceModal({
     if (!visible) {
       clearSilenceTimerRef.current();
       Voice.destroy().then(Voice.removeAllListeners).catch(() => {});
-      try { Tts.stop(); } catch { /* safe */ }
       return;
     }
 
@@ -479,14 +451,12 @@ export default function DashboardVoiceModal({
         clearTimeout(timer);
         clearSilenceTimerRef.current();
         Voice.destroy().then(Voice.removeAllListeners).catch(() => {});
-        try { Tts.stop(); } catch { /* safe */ }
-      };
+        };
     }
 
     return () => {
       clearSilenceTimerRef.current();
       Voice.destroy().then(Voice.removeAllListeners).catch(() => {});
-      try { Tts.stop(); } catch { /* safe */ }
     };
   }, [visible, autoStart, startPulse]);
 
@@ -524,8 +494,7 @@ export default function DashboardVoiceModal({
       setIsListening(false);
       stopPulse();
     }
-    try { Tts.stop(); } catch { /* safe */ }
-    setIsSpeaking(false);
+    Speech.stop();
     onClose();
   }, [clearSilenceTimer, stopPulse, onClose]);
 
@@ -562,14 +531,6 @@ export default function DashboardVoiceModal({
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>{DASHBOARD_STRINGS.VOICE_TITLE}</Text>
             <View style={styles.modalHeaderActions}>
-              {isSpeaking && (
-                <TouchableOpacity style={styles.modalActionBtn} onPress={onStopSpeaking}>
-                  <Icon name="stop-circle" size={16} color={Colors.card} />
-                  <Text style={styles.modalActionBtnText}>
-                    {DASHBOARD_STRINGS.VOICE_STOP}
-                  </Text>
-                </TouchableOpacity>
-              )}
               {hasContent && (
                 <TouchableOpacity style={styles.modalResetBtn} onPress={onReset}>
                   <Icon name="refresh" size={16} color={Colors.primary} />

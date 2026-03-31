@@ -14,7 +14,6 @@ import {
   ListRenderItemInfo,
 } from 'react-native';
 import Voice, { SpeechErrorEvent, SpeechResultsEvent } from '@react-native-voice/voice';
-import Tts from 'react-native-tts';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { DashboardStackParamList } from '../../navigation/types';
 import Header from '../../components/Header';
@@ -334,7 +333,6 @@ export default function VoiceAssistantScreen({ navigation: _navigation }: Props)
   const [textInput, setTextInput] = useState('');
   const [aiResponse, setAiResponse] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
   const [structuredData, setStructuredData] = useState<StructuredData | null>(null);
 
   // Refs to avoid stale closures inside Voice callbacks
@@ -372,29 +370,6 @@ export default function VoiceAssistantScreen({ navigation: _navigation }: Props)
     pulseAnim.setValue(1);
   }, [pulseAnim]);
 
-  // ── TTS speaking state ────────────────────────────────────────────────────
-
-  useEffect(() => {
-    const onStart = () => setIsSpeaking(true);
-    const onFinish = () => setIsSpeaking(false);
-    const onCancel = () => setIsSpeaking(false);
-
-    Tts.addEventListener('tts-start', onStart);
-    Tts.addEventListener('tts-finish', onFinish);
-    Tts.addEventListener('tts-cancel', onCancel);
-
-    return () => {
-      Tts.removeEventListener('tts-start', onStart);
-      Tts.removeEventListener('tts-finish', onFinish);
-      Tts.removeEventListener('tts-cancel', onCancel);
-    };
-  }, []);
-
-  const onStopSpeaking = useCallback(() => {
-    try { Tts.stop(); } catch { /* safe */ }
-    setIsSpeaking(false);
-  }, []);
-
   // ── Silence timer (auto-submit after SILENCE_TIMEOUT_MS with no new words) ──
 
   const clearSilenceTimer = useCallback(() => {
@@ -421,8 +396,6 @@ export default function VoiceAssistantScreen({ navigation: _navigation }: Props)
       setIsListening(false);
       stopPulse();
     }
-    try { Tts.stop(); } catch { /* TTS not active — safe to ignore */ }
-    setIsSpeaking(false);
     setTranscript('');
     setAiResponse('');
     setTextInput('');
@@ -437,7 +410,6 @@ export default function VoiceAssistantScreen({ navigation: _navigation }: Props)
     async (query: string) => {
       if (!query.trim() || isProcessingRef.current) { return; }
 
-      try { Tts.stop(); } catch { /* TTS not active — safe to ignore */ }
       // Clear previous results right before fetching new ones
       setAiResponse('');
       setStructuredData(null);
@@ -457,9 +429,6 @@ export default function VoiceAssistantScreen({ navigation: _navigation }: Props)
 
         await processVoiceQuery(query.trim(), userId, isAdmin, onToken, onData);
 
-        if (aiResponseRef.current.trim()) {
-          Tts.speak(aiResponseRef.current);
-        }
       } catch {
         setAiResponse(VOICE_STRINGS.ERROR_API);
         Alert.alert('Error', VOICE_STRINGS.ERROR_API);
@@ -529,7 +498,6 @@ export default function VoiceAssistantScreen({ navigation: _navigation }: Props)
     return () => {
       clearSilenceTimerRef.current();
       Voice.destroy().then(Voice.removeAllListeners).catch(() => {});
-      try { Tts.stop(); } catch { /* safe */ }
     };
   }, []);
 
@@ -626,12 +594,6 @@ export default function VoiceAssistantScreen({ navigation: _navigation }: Props)
             <View style={styles.responseHeader}>
               <Text style={styles.responseLabel}>{VOICE_STRINGS.LABEL_AI_RESPONSE}</Text>
               <View style={styles.responseHeaderActions}>
-                {isSpeaking && (
-                  <TouchableOpacity style={styles.stopSpeakingBtn} onPress={onStopSpeaking}>
-                    <Text style={styles.stopSpeakingIcon}>⏹</Text>
-                    <Text style={styles.stopSpeakingText}>{VOICE_STRINGS.BTN_STOP_SPEAKING}</Text>
-                  </TouchableOpacity>
-                )}
                 {hasContent && (
                   <TouchableOpacity style={styles.resetBtn} onPress={onReset}>
                     <Text style={styles.resetBtnText}>↺ {VOICE_STRINGS.BTN_RESET}</Text>

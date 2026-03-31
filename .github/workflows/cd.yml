@@ -52,10 +52,11 @@ jobs:
           working-directory: android
 
       # Build APK using Fastlane
-      - name: Build Release
+      - name: Build Debug APK
         run: |
           cd android
-          bundle exec fastlane build_release
+          chmod +x gradlew
+          ./gradlew assembleDebug --stacktrace
 
       # Verify APK exists
       - name: Verify APK
@@ -65,5 +66,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v6
         with:
-          name: app-release-apk-${{ github.run_number }}
-          path: android/app/build/outputs/apk/release/app-release.apk
+          name: app-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
