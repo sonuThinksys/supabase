@@ -104,3 +104,7 @@ jest.mock('react-native-gesture-handler', () => ({
     DOWN: 8,
   },
 }));
+
+jest.mock('react-native-device-info', () => ({
+  getUniqueId: jest.fn(() => '123'),
+}));

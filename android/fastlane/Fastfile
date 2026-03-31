@@ -2,29 +2,39 @@ default_platform(:android)
 
 platform :android do
 
-  desc "Increment version and build APK"
-  lane :build_release do
+  desc "Build and deploy to Play Store"
+  lane :deploy do
 
-    # Increment version code
+    # Get version code
     version_code = ENV["GITHUB_RUN_NUMBER"].to_i
+
+    if version_code == 0
+      UI.user_error!("GITHUB_RUN_NUMBER is missing!")
+    end
+
+    # Set version code
     android_set_version_code(
       version_code: version_code,
-      gradle_file: "android/app/build.gradle"
+      gradle_file: "app/build.gradle"
     )
 
-    # Increment version name
-    current_name = android_get_version_name(
-      gradle_file: "android/app/build.gradle"
-    )
+    # Set version name
     android_set_version_name(
       version_name: "1.0.#{version_code}",
-      gradle_file: "android/app/build.gradle"
+      gradle_file: "app/build.gradle"
     )
 
-    # Build APK
+    # Build AAB (NOT APK)
     gradle(
-      task: "assembleRelease"
+      task: "bundle",
+      build_type: "Release"
     )
+
+    # Upload to Play Store
+    # upload_to_play_store(
+    #   track: "internal", # change to production later
+    #   aab: "app/build/outputs/bundle/release/app-release.aab"
+    # )
 
   end
 

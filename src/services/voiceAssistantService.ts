@@ -65,7 +65,8 @@ const groq = new Groq({
 });
 
 // const MODEL = 'llama-3.3-70b-versatile';
-const MODEL = 'llama-3.1-8b-instant';
+// const MODEL = 'llama-3.1-8b-instant';
+const MODEL = 'llama-3.3-70b-versatile';
 
 // ─── Tool definitions ─────────────────────────────────────────────────────────
 // Rules for llama-3.3-70b-versatile tool schemas:

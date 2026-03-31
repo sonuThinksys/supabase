@@ -494,7 +494,6 @@ export default function DashboardVoiceModal({
       setIsListening(false);
       stopPulse();
     }
-    Speech.stop();
     onClose();
   }, [clearSilenceTimer, stopPulse, onClose]);
 

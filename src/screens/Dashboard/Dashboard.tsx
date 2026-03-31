@@ -99,6 +99,10 @@ export default function DashboardScreen() {
 
   useEffect(() => {
     fetchTodos();
+
+    const existing = supabase.getChannels().find(ch => ch.topic === 'realtime:dashboard-tasks');
+    if (existing) { supabase.removeChannel(existing); }
+
     const channel = supabase
       .channel('dashboard-tasks')
       .on(
