@@ -1,13 +1,15 @@
 name: CD Pipeline
 
 on:
-  workflow_dispatch:
   push:
     branches: [develop]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    env:
+      KEYSTORE_FILE: release.keystore
 
     steps:
       # Checkout
@@ -50,21 +52,22 @@ jobs:
           ruby-version: '3.2'
           bundler-cache: true
           working-directory: android
+          
+      # 🔐 Use secrets via env
+      - name: Decode Keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 --decode > android/app/$KEYSTORE_FILE
 
-      # Build APK using Fastlane
-      - name: Build Debug APK
+      - name: Build APK
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           cd android
-          chmod +x gradlew
-          ./gradlew assembleDebug --stacktrace
+          ./gradlew assembleRelease
 
-      # Verify APK exists
       - name: Verify APK
         run: ls -la android/app/build/outputs/apk/release/
-
-      # Upload APK
-      - name: Upload APK
-        uses: actions/upload-artifact@v6
-        with:
-          name: app-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
