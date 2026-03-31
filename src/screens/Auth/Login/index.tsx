@@ -16,6 +16,7 @@ import AuthFooterLink from '../../../components/auth/AuthFooterLink';
 import SocialSignInButton from './SocialSignInButton';
 import { styles } from './Login.styles';
 import { LOGIN_STRINGS } from './Login.constants';
+import DeviceInfo from 'react-native-device-info';
 
 type SocialProvider = 'Google' | 'Apple';
 
@@ -38,7 +39,8 @@ export default function LoginScreen({ navigation }: Props) {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
+  const version = DeviceInfo.getVersion();
+  const build = DeviceInfo.getBuildNumber();
   const toggleShowPassword = useCallback(() => setShowPassword(p => !p), []);
 
   const signIn = useCallback(async () => {
@@ -127,6 +129,9 @@ export default function LoginScreen({ navigation }: Props) {
         linkText={LOGIN_STRINGS.SIGNUP_LINK}
         onPress={onNavigateSignUp}
       />
+      <View style={styles.renderView}>
+        <Text style={styles.labelText}>Version : {version} ({build})</Text>
+      </View>
     </AuthCard>
   );
 }

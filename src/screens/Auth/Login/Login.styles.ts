@@ -41,4 +41,14 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+   renderView: {
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  labelText: {
+    color: Colors.primary,
+    fontSize: 12,
+  },
 });

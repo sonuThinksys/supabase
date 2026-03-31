@@ -7,6 +7,7 @@ import { Routes } from './Routes';
 import { Colors } from '../theme/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppSelector } from '../store/hooks';
+import DeviceInfo from 'react-native-device-info';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -80,6 +81,8 @@ export default function CustomDrawerContent({ navigation }: DrawerContentCompone
   const activeRoute  = useNavigationState(getActiveRoute);
   const role = useAppSelector(state => state.user.role);
   const isAdmin = role === 'admin';
+  const version = DeviceInfo.getVersion();
+  const build = DeviceInfo.getBuildNumber();
   const FilterMenuItems = MENU_ITEMS.filter(item => {
     if (item.adminOnly) { return isAdmin; }
     return true;
@@ -139,6 +142,9 @@ export default function CustomDrawerContent({ navigation }: DrawerContentCompone
       {/* Logout */}
       <View style={styles.logoutContainer}>
         <Button color={Colors.primary} title={DRAWER_STRINGS.LOGOUT} onPress={onLogout} />
+      </View>
+      <View style={styles.renderView}>
+        <Text style={styles.labelText}>Version : {version} ({build})</Text>
       </View>
     </View>
   );
@@ -226,5 +232,18 @@ const styles = StyleSheet.create({
   // Logout
   logoutContainer: {
     paddingVertical: 12,
+  },
+  renderView: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 20,
+    borderRadius: 4,
+    borderColor: Colors.borderColor,
+  },
+  labelText: {
+    color: Colors.primary,
+    fontSize: 12,
   },
 }); 
