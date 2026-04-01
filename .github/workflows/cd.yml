@@ -3,7 +3,7 @@ name: CD Pipeline
 on:
   push:
     branches: [develop]
-
+  workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -80,15 +80,16 @@ jobs:
       # Install Fastlane
       - name: Install Fastlane
         run: gem install fastlane
+      - name: Create Google Play key
+        run: echo "$PLAY_STORE_JSON" > fastlane/google-play-key.json
+        env:
+          PLAY_STORE_JSON: ${{ secrets.PLAY_STORE_JSON }}
 
       # Deploy to Play Store
       - name: Deploy to Play Store
         run: |
           cd android
           fastlane deploy
-        env:
-        #   SUPPLY_JSON_KEY_DATA: ${{ secrets.PLAY_STORE_JSON }}
-          GITHUB_RUN_NUMBER: ${{ github.run_number }}
 
       # Optional: Upload AAB as artifact
       - name: Upload AAB
