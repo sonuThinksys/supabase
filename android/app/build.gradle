@@ -93,10 +93,11 @@ android {
             keyPassword 'android'
         }
         release {
-              storeFile project.hasProperty('MYAPP_UPLOAD_STORE_FILE') ? file(project.findProperty('MYAPP_UPLOAD_STORE_FILE')) : null
-              storePassword project.findProperty('MYAPP_UPLOAD_STORE_PASSWORD') ?: ''
-              keyAlias project.findProperty('MYAPP_UPLOAD_KEY_ALIAS') ?: ''
-              keyPassword project.findProperty('MYAPP_UPLOAD_KEY_PASSWORD') ?: ''
+              def storePath = System.getenv('KEYSTORE_FILE') ?: project.findProperty('MYAPP_UPLOAD_STORE_FILE')
+              storeFile     storePath ? file(storePath) : null
+              storePassword System.getenv('KEYSTORE_PASSWORD') ?: project.findProperty('MYAPP_UPLOAD_STORE_PASSWORD') ?: ''
+              keyAlias      System.getenv('KEY_ALIAS')         ?: project.findProperty('MYAPP_UPLOAD_KEY_ALIAS')         ?: ''
+              keyPassword   System.getenv('KEY_PASSWORD')      ?: project.findProperty('MYAPP_UPLOAD_KEY_PASSWORD')      ?: ''
         }
     }
     buildTypes {

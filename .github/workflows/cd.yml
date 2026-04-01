@@ -52,19 +52,11 @@ jobs:
         run: |
           echo "$KEYSTORE_BASE64" | base64 --decode > android/app/$KEYSTORE_FILE
 
-      # 🔐 Inject signing properties into gradle.properties at runtime
-      - name: Set signing properties
+      - name: Build AAB
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: |
-          echo "MYAPP_UPLOAD_STORE_FILE=$KEYSTORE_FILE" >> android/gradle.properties
-          echo "MYAPP_UPLOAD_KEY_ALIAS=$KEY_ALIAS" >> android/gradle.properties
-          echo "MYAPP_UPLOAD_STORE_PASSWORD=$KEYSTORE_PASSWORD" >> android/gradle.properties
-          echo "MYAPP_UPLOAD_KEY_PASSWORD=$KEY_PASSWORD" >> android/gradle.properties
-
-      - name: Build AAB
         run: |
           cd android
           ./gradlew bundleRelease -Dorg.gradle.daemon=false
@@ -96,6 +88,10 @@ jobs:
 
       # Deploy to Play Store
       - name: Deploy to Play Store
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           cd android
           fastlane deploy

@@ -9,6 +9,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppSelector } from '../store/hooks';
 import DeviceInfo from 'react-native-device-info';
 
+const APP_VERSION = DeviceInfo.getVersion();
+const APP_BUILD = DeviceInfo.getBuildNumber();
+
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const DRAWER_STRINGS = {
@@ -19,6 +22,7 @@ const DRAWER_STRINGS = {
   TAGS: 'Tags',
   VOICE_ASSISTANT: '🎙️ Voice Assistant',
   LOGOUT: 'Logout',
+  VERSION_LABEL: 'Version :',
 };
 
 type MenuItem = { label: string; route: string; adminOnly?: boolean };
@@ -81,8 +85,6 @@ export default function CustomDrawerContent({ navigation }: DrawerContentCompone
   const activeRoute  = useNavigationState(getActiveRoute);
   const role = useAppSelector(state => state.user.role);
   const isAdmin = role === 'admin';
-  const version = DeviceInfo.getVersion();
-  const build = DeviceInfo.getBuildNumber();
   const FilterMenuItems = MENU_ITEMS.filter(item => {
     if (item.adminOnly) { return isAdmin; }
     return true;
@@ -144,7 +146,7 @@ export default function CustomDrawerContent({ navigation }: DrawerContentCompone
         <Button color={Colors.primary} title={DRAWER_STRINGS.LOGOUT} onPress={onLogout} />
       </View>
       <View style={styles.renderView}>
-        <Text style={styles.labelText}>Version : {version} ({build})</Text>
+        <Text style={styles.labelText}>{DRAWER_STRINGS.VERSION_LABEL} {APP_VERSION} ({APP_BUILD})</Text>
       </View>
     </View>
   );
@@ -240,6 +242,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: 20,
     borderRadius: 4,
+    borderWidth: 1,
     borderColor: Colors.borderColor,
   },
   labelText: {
