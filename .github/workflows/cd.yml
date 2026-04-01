@@ -80,8 +80,10 @@ jobs:
       # Install Fastlane
       - name: Install Fastlane
         run: gem install fastlane
+        
+      # Setup Google Play credentials
       - name: Create Google Play key
-        run: echo "$PLAY_STORE_JSON" > fastlane/google-play-key.json
+        run: echo "$PLAY_STORE_JSON" > android/fastlane/google-play-key.json
         env:
           PLAY_STORE_JSON: ${{ secrets.PLAY_STORE_JSON }}
 
