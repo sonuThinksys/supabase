@@ -11,18 +11,18 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
       - name: Setup Node
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: 'yarn'
 
       # Install dependencies (faster & consistent)
       - name: Install dependencies
-        run: yarn install
+        run: yarn install --frozen-lockfile
 
       # Run tests (CI-safe mode)
       - name: Run tests
-        run: yarn test
+        run: yarn test --ci
